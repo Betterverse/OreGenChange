@@ -17,7 +17,6 @@ public class OreGenChange extends JavaPlugin {
 
     public void onEnable() {
         for (World world : this.getServer().getWorlds()) {
-            System.out.println("durrrr");
             Config config = new Config(this, world);
             HashMap<String, Double> settings = config.init();
             worlds.put(world, settings);
