@@ -3,5 +3,4 @@ description: Overrides Vanilla ore generation, allowing much more dynamic popula
   of ore and stoof.
 main: net.betterverse.oregenchange.OreGenChange
 name: OreGenChange
-load: startup
 version: '1.0'

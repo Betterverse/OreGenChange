@@ -1,20 +1,22 @@
 package net.betterverse.oregenchange;
 
+import org.bukkit.World;
+
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 public class Config {
 
-    public ArrayList<String> worlds = new ArrayList<String>();
-    OreGenChange plugin;
+    World world;
     File configDir;
+    OreGenChange plugin;
+    public ArrayList<String> worlds = new ArrayList<String>();
     HashMap<String, Double> settings = new HashMap<String, Double>();
     private String defaultConfig = ("# OreGenChange config file\r\n" +
             "# This file is rather fragile, try not to do anything other than alter the numbers and @ line!\r\n" +
-            "# Below are the worlds in which the plugin will have effect, seperate with commas\r\n" +
-            "@ ,world,example1,example2\r\n" +
+            "# To enable this world, set to true\r\n" +
+            "@enabled? false\r\n" +
             "# Chance is the chance of a vein generating per pass. 0.1 - 1\r\n" +
             "# Passes are the number of chances of generating per chunk, should be used in conjunction with Chance\r\n" +
             "# SizeMax is the maximum iterations the vein can make\r\n" +
@@ -51,16 +53,18 @@ public class Config {
             "goldSizeMin 2\r\n" +
             "goldMaxHeight 28\r\n");
 
-    public Config(OreGenChange plugin) {
+    public Config(OreGenChange plugin, World world) {
         this.plugin = plugin;
+        this.world = world;
     }
 
     public HashMap<String, Double> init() {
+        System.out.println("durrrr");
         this.configDir = plugin.getDataFolder();
         if (!this.configDir.exists())
             this.configDir.mkdir();
 
-        File configFile = new File(configDir.getAbsoluteFile() + "/config.txt");
+        File configFile = new File(configDir.getAbsoluteFile() + "/" + world.getName() +".txt");
         if (!configFile.exists())
             try {
                 createConfig(configFile);
@@ -79,9 +83,9 @@ public class Config {
         try {
             while ((l = in.readLine()) != null) {
                 if (!l.startsWith("#")) {
-                    if (l.startsWith("@")) {
-                        String[] w = l.split(",");
-                        Collections.addAll(worlds, w);
+                    if (l.startsWith("@enabled?")) {
+                        if (l.split(" ")[1].equals("true"))
+                            plugin.worldEnabled.add(world);
                     } else {
                         String[] line = l.split(" ");
                         String key = line[0];

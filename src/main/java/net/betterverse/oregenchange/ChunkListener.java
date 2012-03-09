@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkPopulateEvent;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class ChunkListener implements Listener {
@@ -57,42 +58,12 @@ public class ChunkListener implements Listener {
 
     public ChunkListener(OreGenChange plugin) {
         this.plugin = plugin;
-        ironChance = plugin.settings.get("ironChance");
-        ironPasses = plugin.settings.get("ironPasses");
-        ironSizeMax = plugin.settings.get("ironSizeMax");
-        ironSizeMin = plugin.settings.get("ironSizeMin");
-        ironMaxHeight = plugin.settings.get("ironMaxHeight");
-        diamondChance = plugin.settings.get("diamondChance");
-        diamondPasses = plugin.settings.get("diamondPasses");
-        diamondSizeMax = plugin.settings.get("diamondSizeMax");
-        diamondSizeMin = plugin.settings.get("diamondSizeMin");
-        diamondMaxHeight = plugin.settings.get("diamondMaxHeight");
-        coalChance = plugin.settings.get("coalChance");
-        coalPasses = plugin.settings.get("coalPasses");
-        coalSizeMax = plugin.settings.get("coalSizeMax");
-        coalSizeMin = plugin.settings.get("coalSizeMin");
-        coalMaxHeight = plugin.settings.get("coalMaxHeight");
-        lapisChance = plugin.settings.get("lapisChance");
-        lapisPasses = plugin.settings.get("lapisPasses");
-        lapisSizeMax = plugin.settings.get("lapisSizeMax");
-        lapisSizeMin = plugin.settings.get("lapisSizeMin");
-        lapisMaxHeight = plugin.settings.get("lapisMaxHeight");
-        redstoneChance = plugin.settings.get("redstoneChance");
-        redstonePasses = plugin.settings.get("redstonePasses");
-        redstoneSizeMax = plugin.settings.get("redstoneSizeMax");
-        redstoneSizeMin = plugin.settings.get("redstoneSizeMin");
-        redstoneMaxHeight = plugin.settings.get("redstoneMaxHeight");
-        goldChance = plugin.settings.get("goldChance");
-        goldPasses = plugin.settings.get("goldPasses");
-        goldSizeMax = plugin.settings.get("goldSizeMax");
-        goldSizeMin = plugin.settings.get("goldSizeMin");
-        goldMaxHeight = plugin.settings.get("goldMaxHeight");
     }
 
     @EventHandler
     public void onChunkPopulate(ChunkPopulateEvent event) {
 
-        if (plugin.worlds.contains(event.getWorld().getName())) {
+        if (plugin.worldEnabled.contains(event.getWorld())) {
             Chunk chunk = event.getChunk();
             // Removes original ores, don't think there's a faster way of doing this :c
             for (int x = 0; x < 16; x++) {
@@ -107,6 +78,38 @@ public class ChunkListener implements Listener {
                 }
             }
 
+            HashMap<String, Double> settings = plugin.worlds.get(event.getWorld());
+            ironChance = settings.get("ironChance");
+            ironPasses = settings.get("ironPasses");
+            ironSizeMax = settings.get("ironSizeMax");
+            ironSizeMin = settings.get("ironSizeMin");
+            ironMaxHeight = settings.get("ironMaxHeight");
+            diamondChance = settings.get("diamondChance");
+            diamondPasses = settings.get("diamondPasses");
+            diamondSizeMax = settings.get("diamondSizeMax");
+            diamondSizeMin = settings.get("diamondSizeMin");
+            diamondMaxHeight = settings.get("diamondMaxHeight");
+            coalChance = settings.get("coalChance");
+            coalPasses = settings.get("coalPasses");
+            coalSizeMax = settings.get("coalSizeMax");
+            coalSizeMin = settings.get("coalSizeMin");
+            coalMaxHeight = settings.get("coalMaxHeight");
+            lapisChance = settings.get("lapisChance");
+            lapisPasses = settings.get("lapisPasses");
+            lapisSizeMax = settings.get("lapisSizeMax");
+            lapisSizeMin = settings.get("lapisSizeMin");
+            lapisMaxHeight = settings.get("lapisMaxHeight");
+            redstoneChance = settings.get("redstoneChance");
+            redstonePasses = settings.get("redstonePasses");
+            redstoneSizeMax = settings.get("redstoneSizeMax");
+            redstoneSizeMin = settings.get("redstoneSizeMin");
+            redstoneMaxHeight = settings.get("redstoneMaxHeight");
+            goldChance = settings.get("goldChance");
+            goldPasses = settings.get("goldPasses");
+            goldSizeMax = settings.get("goldSizeMax");
+            goldSizeMin = settings.get("goldSizeMin");
+            goldMaxHeight = settings.get("goldMaxHeight");
+            
             Material[] ores = {gold, diamond, iron, coal, lapis, redstone};
             for (int i = 0; i < ores.length; i++) {
                 // there's probably an easier way of doing this but i dont care
@@ -187,7 +190,7 @@ public class ChunkListener implements Listener {
                     b = chunk.getBlock(x - h1, y - v1, z + h1);
                 else
                     b = chunk.getBlock(x, y - v1, z - h1);
-                if (b.getType() == stone && r.nextInt(8) != 1)
+                if (b.getType() == stone && r.nextInt(6) != 1)
                     b.setType(ore);
             }
         }
