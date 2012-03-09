@@ -1,0 +1,7 @@
+author: King_Rat
+description: Overrides Vanilla ore generation, allowing much more dynamic population
+  of ore and stoof.
+main: net.betterverse.oregenchange.OreGenChange
+name: OreGenChange
+load: startup
+version: '1.0'
