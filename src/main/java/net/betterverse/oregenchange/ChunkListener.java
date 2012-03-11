@@ -43,12 +43,6 @@ public class ChunkListener implements Listener {
     private double goldSizeMin;
     private double goldMaxHeight;
     private Material stone = Material.STONE;
-    private Material gold = Material.GOLD_ORE;
-    private Material diamond = Material.DIAMOND_ORE;
-    private Material iron = Material.IRON_ORE;
-    private Material coal = Material.COAL_ORE;
-    private Material lapis = Material.LAPIS_ORE;
-    private Material redstone = Material.REDSTONE_ORE;
     private OreGenChange plugin;
     private double chance;
     private int passes;
@@ -70,7 +64,7 @@ public class ChunkListener implements Listener {
                 for (int z = 0; z < 16; z++) {
                     for (int y = 0; y < 90; y++) {
                         Material block = chunk.getBlock(x, y, z).getType();
-                        if (block == gold || block == diamond || block == iron || block == coal || block == lapis || block == redstone) {
+                        if (block == Material.GOLD_ORE || block == Material.DIAMOND_ORE || block == Material.IRON_ORE || block == Material.COAL_ORE || block == Material.LAPIS_ORE || block == Material.REDSTONE_ORE) {
                             Block b = chunk.getBlock(x, y, z);
                             b.setType(stone);
                         }
@@ -109,47 +103,47 @@ public class ChunkListener implements Listener {
             goldSizeMax = settings.get("goldSizeMax");
             goldSizeMin = settings.get("goldSizeMin");
             goldMaxHeight = settings.get("goldMaxHeight");
-            
-            Material[] ores = {gold, diamond, iron, coal, lapis, redstone};
-            for (int i = 0; i < ores.length; i++) {
+
+            Material[] ores = {Material.GOLD_ORE, Material.DIAMOND_ORE, Material.IRON_ORE, Material.COAL_ORE, Material.LAPIS_ORE, Material.REDSTONE_ORE};
+            for (Material ore : ores) {
                 // there's probably an easier way of doing this but i dont care
-                if (i == 0) {
+                if (ore == Material.GOLD_ORE) {
                     chance = goldChance;
                     passes = (int) goldPasses;
                     maxSize = (int) goldSizeMax;
                     minSize = (int) goldSizeMin;
                     maxHeight = (int) goldMaxHeight;
-                } else if (i == 1) {
+                } else if (ore == Material.DIAMOND_ORE) {
                     chance = diamondChance;
                     passes = (int) diamondPasses;
                     maxSize = (int) diamondSizeMax;
                     minSize = (int) diamondSizeMin;
                     maxHeight = (int) diamondMaxHeight;
-                } else if (i == 2) {
+                } else if (ore == Material.IRON_ORE) {
                     chance = ironChance;
                     passes = (int) ironPasses;
                     maxSize = (int) ironSizeMax;
                     minSize = (int) ironSizeMin;
                     maxHeight = (int) ironMaxHeight;
-                } else if (i == 3) {
+                } else if (ore == Material.COAL_ORE) {
                     chance = coalChance;
                     passes = (int) coalPasses;
                     maxSize = (int) coalSizeMax;
                     minSize = (int) coalSizeMin;
                     maxHeight = (int) coalMaxHeight;
-                } else if (i == 4) {
+                } else if (ore == Material.LAPIS_ORE) {
                     chance = (int) lapisChance;
                     passes = (int) lapisPasses;
                     maxSize = (int) lapisSizeMax;
                     minSize = (int) lapisSizeMin;
                     maxHeight = (int) lapisMaxHeight;
-                } else if (i == 5) {
+                } else if (ore == Material.REDSTONE_ORE) {
                     chance = redstoneChance;
                     passes = (int) redstonePasses;
                     maxSize = (int) redstoneSizeMax;
                     minSize = (int) redstoneSizeMin;
                     maxHeight = (int) redstoneMaxHeight;
-                }
+                } else continue;
 
                 for (int l = 0; l < passes; l++) {
                     if ((chance) >= Math.random()) {
@@ -157,7 +151,7 @@ public class ChunkListener implements Listener {
                         int x = r.nextInt(16);
                         int z = r.nextInt(16);
                         int y = r.nextInt(maxHeight - 4) + 4;
-                        snake(x, y, z, minSize, maxSize, r, ores[i], chunk);
+                        snake(x, y, z, minSize, maxSize, r, ore, chunk);
                     }
                 }
             }
@@ -183,15 +177,16 @@ public class ChunkListener implements Listener {
     }
 
     private void deposit(int x, int y, int z, Material ore, Chunk chunk, Random r, boolean dir) {
-        for (int h1 = 0; h1 < 3; h1++) {
+        for (int h1 = -1; h1 < 2; h1++) {
             for (int v1 = 0; v1 < 2; v1++) {
                 Block b;
                 if (dir)
                     b = chunk.getBlock(x - h1, y - v1, z + h1);
                 else
                     b = chunk.getBlock(x, y - v1, z - h1);
-                if (b.getType() == stone && r.nextInt(6) != 1)
+                if (b.getType() == stone && r.nextInt(6) != 1) {
                     b.setType(ore);
+                }
             }
         }
     }

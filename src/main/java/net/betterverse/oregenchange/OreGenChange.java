@@ -25,6 +25,7 @@ public class OreGenChange extends JavaPlugin {
         ChunkListener listener = new ChunkListener(this);
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(listener, this);
+        System.out.println("durrrr");
     }
 }
 
