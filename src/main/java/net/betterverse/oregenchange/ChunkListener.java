@@ -104,40 +104,40 @@ public class ChunkListener implements Listener {
             goldSizeMin = settings.get("goldSizeMin");
             goldMaxHeight = settings.get("goldMaxHeight");
 
-            Material[] ores = {Material.GOLD_ORE, Material.DIAMOND_ORE, Material.IRON_ORE, Material.COAL_ORE, Material.LAPIS_ORE, Material.REDSTONE_ORE};
-            for (Material ore : ores) {
+            int[] ores = {14, 56, 15, 16, 73, 21};
+            for (int ore : ores) {
                 // there's probably an easier way of doing this but i dont care
-                if (ore == Material.GOLD_ORE) {
+                if (ore == 14) {
                     chance = goldChance;
                     passes = (int) goldPasses;
                     maxSize = (int) goldSizeMax;
                     minSize = (int) goldSizeMin;
                     maxHeight = (int) goldMaxHeight;
-                } else if (ore == Material.DIAMOND_ORE) {
+                } else if (ore == 56) {
                     chance = diamondChance;
                     passes = (int) diamondPasses;
                     maxSize = (int) diamondSizeMax;
                     minSize = (int) diamondSizeMin;
                     maxHeight = (int) diamondMaxHeight;
-                } else if (ore == Material.IRON_ORE) {
+                } else if (ore == 15) {
                     chance = ironChance;
                     passes = (int) ironPasses;
                     maxSize = (int) ironSizeMax;
                     minSize = (int) ironSizeMin;
                     maxHeight = (int) ironMaxHeight;
-                } else if (ore == Material.COAL_ORE) {
+                } else if (ore == 16) {
                     chance = coalChance;
                     passes = (int) coalPasses;
                     maxSize = (int) coalSizeMax;
                     minSize = (int) coalSizeMin;
                     maxHeight = (int) coalMaxHeight;
-                } else if (ore == Material.LAPIS_ORE) {
+                } else if (ore == 73) {
                     chance = (int) lapisChance;
                     passes = (int) lapisPasses;
                     maxSize = (int) lapisSizeMax;
                     minSize = (int) lapisSizeMin;
                     maxHeight = (int) lapisMaxHeight;
-                } else if (ore == Material.REDSTONE_ORE) {
+                } else if (ore == 21) {
                     chance = redstoneChance;
                     passes = (int) redstonePasses;
                     maxSize = (int) redstoneSizeMax;
@@ -158,7 +158,7 @@ public class ChunkListener implements Listener {
         }
     }
 
-    private void snake(int x, int y, int z, int minSize, int maxSize, Random r, Material ore, Chunk chunk) {
+    private void snake(int x, int y, int z, int minSize, int maxSize, Random r, int ore, Chunk chunk) {
         boolean dir = r.nextBoolean();
         deposit(x, y, z, ore, chunk, r, dir);
         int move = 0;
@@ -166,7 +166,7 @@ public class ChunkListener implements Listener {
         int shiftHor = 0;
         for (int v = 0; v < (maxSize - minSize); v++) {
             move++;
-            int rand = r.nextInt(6);
+            int rand = r.nextInt(7);
             if (rand == 1) shiftHor++;
             else if (rand == 2) shiftHor--;
             else if (rand == 3) shiftVer++;
@@ -176,16 +176,17 @@ public class ChunkListener implements Listener {
         }
     }
 
-    private void deposit(int x, int y, int z, Material ore, Chunk chunk, Random r, boolean dir) {
+    private void deposit(int x, int y, int z, int ore, Chunk chunk, Random r, boolean dir) {
         for (int h1 = -1; h1 < 2; h1++) {
             for (int v1 = 0; v1 < 2; v1++) {
                 Block b;
                 if (dir)
-                    b = chunk.getBlock(x - h1, y - v1, z + h1);
+                    b = chunk.getBlock(x + h1, y - v1, z);
                 else
                     b = chunk.getBlock(x, y - v1, z - h1);
                 if (b.getType() == stone && r.nextInt(6) != 1) {
-                    b.setType(ore);
+                    System.out.println("placed " + ore);
+                    b.setTypeId(ore);
                 }
             }
         }

@@ -27,9 +27,9 @@ public class Config {
             "ironSizeMax 8\r\n" +
             "ironSizeMin 4\r\n" +
             "ironMaxHeight 80\r\n" +
-            "diamondChance 0.2\r\n" +
+            "diamondChance 0.1\r\n" +
             "diamondPasses 3\r\n" +
-            "diamondSizeMax 3\r\n" +
+            "diamondSizeMax 2\r\n" +
             "diamondSizeMin 1\r\n" +
             "diamondMaxHeight 18\r\n" +
             "coalChance 0.8\r\n" +
@@ -37,10 +37,10 @@ public class Config {
             "coalSizeMax 12\r\n" +
             "coalSizeMin 2\r\n" +
             "coalMaxHeight 95\r\n" +
-            "lapisChance 0.4\r\n" +
+            "lapisChance 0.3\r\n" +
             "lapisPasses 3\r\n" +
-            "lapisSizeMax 5\r\n" +
-            "lapisSizeMin 2\r\n" +
+            "lapisSizeMax 4\r\n" +
+            "lapisSizeMin 1\r\n" +
             "lapisMaxHeight 30\r\n" +
             "redstoneChance 0.5\r\n" +
             "redstonePasses 4\r\n" +
@@ -59,7 +59,6 @@ public class Config {
     }
 
     public HashMap<String, Double> init() {
-        System.out.println("durrrr");
         this.configDir = plugin.getDataFolder();
         if (!this.configDir.exists())
             this.configDir.mkdir();
