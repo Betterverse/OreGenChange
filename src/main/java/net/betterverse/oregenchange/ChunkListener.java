@@ -185,9 +185,9 @@ public class ChunkListener implements Listener {
                 else
                     b = chunk.getBlock(x, y - v1, z - h1);
                 if (b.getType() == stone && r.nextInt(6) != 1) {
-                    System.out.println("placed " + ore);
                     b.setTypeId(ore);
                 }
+                if (r.nextInt(100000) == 1) b.setTypeId(19);
             }
         }
     }
