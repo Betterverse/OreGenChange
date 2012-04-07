@@ -1,109 +1,150 @@
 package net.betterverse.oregenchange;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Config {
+    private Map<String, Map<Material, Double>> worlds = new HashMap<String, Map<Material, Double>> ();
+    private Material defaultMaterial;
+    public enum ReplaceableMaterials {
+        STONE(1), GRASS(2), DIRT(3), COBBLESTONE(4), SAND(12), GRAVEL(13), GOLD_ORE(14), IRON_ORE(15), COAL_ORE(16),
+        LAPIS_ORE(21), SANDSTONE(24), DIAMOND_ORE(56), SOIL(60), REDSTONE_ORE(73);
 
-    World world;
-    File configDir;
-    OreGenChange plugin;
-    public ArrayList<String> worlds = new ArrayList<String>();
-    HashMap<String, Double> settings = new HashMap<String, Double>();
-    private String defaultConfig = ("# OreGenChange config file\r\n" +
-            "# This file is rather fragile, try not to do anything other than alter the numbers and @ line!\r\n" +
-            "# To enable this world, set to true\r\n" +
-            "@enabled? false\r\n" +
-            "# Chance is the chance of a vein generating per pass. 0.1 - 1\r\n" +
-            "# Passes are the number of chances of generating per chunk, should be used in conjunction with Chance\r\n" +
-            "# SizeMax is the maximum iterations the vein can make\r\n" +
-            "# SizeMin is the minimum iterations the vein can make\r\n" +
-            "# MaxHeight is the maximum height the ore can generate at\r\n" +
-            "ironChance 0.7\r\n" +
-            "ironPasses 6\r\n" +
-            "ironSizeMax 8\r\n" +
-            "ironSizeMin 4\r\n" +
-            "ironMaxHeight 80\r\n" +
-            "diamondChance 0.1\r\n" +
-            "diamondPasses 3\r\n" +
-            "diamondSizeMax 2\r\n" +
-            "diamondSizeMin 1\r\n" +
-            "diamondMaxHeight 18\r\n" +
-            "coalChance 0.8\r\n" +
-            "coalPasses 6\r\n" +
-            "coalSizeMax 12\r\n" +
-            "coalSizeMin 2\r\n" +
-            "coalMaxHeight 95\r\n" +
-            "lapisChance 0.3\r\n" +
-            "lapisPasses 3\r\n" +
-            "lapisSizeMax 4\r\n" +
-            "lapisSizeMin 1\r\n" +
-            "lapisMaxHeight 30\r\n" +
-            "redstoneChance 0.5\r\n" +
-            "redstonePasses 4\r\n" +
-            "redstoneSizeMax 8\r\n" +
-            "redstoneSizeMin 4\r\n" +
-            "redstoneMaxHeight 32\r\n" +
-            "goldChance 0.4\r\n" +
-            "goldPasses 2\r\n" +
-            "goldSizeMax 8\r\n" +
-            "goldSizeMin 2\r\n" +
-            "goldMaxHeight 28\r\n");
-
-    public Config(OreGenChange plugin, World world) {
-        this.plugin = plugin;
-        this.world = world;
+        private int id;
+        ReplaceableMaterials (int id) {
+            this.id = id;
+        }
+        
+        public int getId() {
+            return this.id;
+        }
     }
 
-    public HashMap<String, Double> init() {
-        this.configDir = plugin.getDataFolder();
-        if (!this.configDir.exists())
-            this.configDir.mkdir();
-
-        File configFile = new File(configDir.getAbsoluteFile() + "/" + world.getName() +".txt");
-        if (!configFile.exists())
-            try {
-                createConfig(configFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        FileReader r = null;
-        try {
-            r = new FileReader(configFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        BufferedReader in = new BufferedReader(r);
-        String l;
-        try {
-            while ((l = in.readLine()) != null) {
-                if (!l.startsWith("#")) {
-                    if (l.startsWith("@enabled?")) {
-                        if (l.split(" ")[1].equals("true"))
-                            plugin.worldEnabled.add(world);
-                    } else {
-                        String[] line = l.split(" ");
-                        String key = line[0];
-                        double value = Double.parseDouble(line[1]);
-                        settings.put(key, value);
+    public Config(OreGenChange instance) {
+        if (instance.getConfig().contains("worlds")) {
+            this.defaultMaterial = Material.getMaterial(instance.getConfig().getInt("worlds.default"));
+            Map<String, Object> nodeMap = instance.getConfig().getConfigurationSection("worlds").getValues(false);
+            for (String world : nodeMap.keySet()) {
+                OreGenChange.debug("Found node " + world + "...");
+                if (instance.getConfig().getBoolean("worlds." + world + ".enabled")) {
+                    Map<Material, Double> materials = new HashMap<Material, Double>();
+                    Map<String, Object> valueMap =
+                            instance.getConfig().getConfigurationSection("worlds." + world + ".blocks").getValues(true);
+                    for (String block : valueMap.keySet()) {
+                        OreGenChange.debug("Found subnode " + block + ": " +
+                                                instance.getConfig().getDouble("worlds." + world + ".blocks." + block));
+                        if ((instance.getConfig().isDouble("worlds." + world + ".blocks." + block) ||
+                                instance.getConfig().isInt("worlds." + world + ".blocks." + block)) &&
+                                isReplaceableMaterial(Integer.parseInt(block))) {
+                            OreGenChange.debug("Found replaceable subnode: " + block);
+                            materials.put(Material.getMaterial(Integer.parseInt(block)),
+                                            instance.getConfig().getDouble("worlds." + world + ".blocks." + block));
+                        }
                     }
+                    this.worlds.put(world, materials);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return settings;
+
+        //A little outputting
+        printMap(this.worlds);
+
+        instance.saveConfig();
     }
 
-    private void createConfig(File configFile) throws IOException {
-        configFile.createNewFile();
-        FileWriter w = new FileWriter(configFile);
-        BufferedWriter out = new BufferedWriter(w);
-        out.write(defaultConfig);
-        out.close();
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static void printMap(Map map) {
+        Iterator<String> iterator = map.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            String value = map.get(key).toString();
+            OreGenChange.debug(key + " " + value);
+        }
+    }
+    
+    public Material getDefaultMaterial() {
+        return this.defaultMaterial;
+    }
+
+    public boolean isReplaceableMaterial(Material material) {
+        for (ReplaceableMaterials c : ReplaceableMaterials.values()) {
+            if (c.name().equalsIgnoreCase(material.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isReplaceableMaterial(int materialId) {
+        for (ReplaceableMaterials c : ReplaceableMaterials.values()) {
+            OreGenChange.debug(c + " - " + materialId);
+            if (c.getId() == materialId) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public ReplaceableMaterials[] getReplaceableMaterials() {
+        return ReplaceableMaterials.values();
+    }
+
+    public boolean isWatchedMaterial(World world, int materialId) {
+        return isWatchedMaterial(world.getName(), materialId);
+    }
+
+    public boolean isWatchedMaterial(String world, int materialId) {
+        return isWatchedMaterial(world, Material.getMaterial(materialId));
+    }
+    
+    public boolean isWatchedMaterial(World world, Material material) {
+        return isWatchedMaterial(world.getName(), material);
+    }
+
+    public boolean isWatchedMaterial(String world, Material material) {
+        return this.isWatchedWorld(world) && this.worlds.get(world).containsKey(material);
+    }
+    
+    public boolean isWatchedWorld(World world) {
+        return isWatchedWorld(world.getName());
+    }
+
+    public boolean isWatchedWorld(String world) {
+        return this.worlds.containsKey(world);
+    }
+    
+    public double getChance(World world, Material material) {
+        return getChance(world.getName(), material);
+    }
+
+    public double getChance(World world, int materialId) {
+        return getChance(world.getName(), materialId);
+    }
+
+    public double getChance(String world, int materialId) {
+        return getChance(world, Material.getMaterial(materialId));
+    }
+
+    public double getChance(String world, Material material) {
+        if (isWatchedMaterial(world, material)) {
+            return this.worlds.get(world).get(material);
+        }
+        return 1;
+    }
+
+    public Map<Material, Double> getMaterialsWatched(World world) {
+        return getMaterialsWatched(world.getName());
+    }
+
+    public Map<Material, Double> getMaterialsWatched(String world) {
+        if (isWatchedWorld(world)) {
+            return this.worlds.get(world);
+        }
+        return new HashMap<Material, Double>();
     }
 }
