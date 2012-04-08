@@ -1,6 +1,5 @@
 author: Contex
-description: Overrides Vanilla ore generation, allowing much more dynamic population
-  of ore and stoof.
+description: Overrides Vanilla ore generation, allowing much more dynamic population of ore and stoof.
 main: net.betterverse.oregenchange.OreGenChange
 name: OreGenChange
-version: '1.0'
+version: '2.0'

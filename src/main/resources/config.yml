@@ -1,16 +1,17 @@
 worlds:
+  debug: false
   default: 1
   world:
     enabled: true
     blocks:
-      '3': 1.5
       '14': 2.3
       '16': 0
       '56': 3
+      '73': 1.5
   world_nether:
     enabled: false
     blocks:
-      '3': 1.5
       '14': 5
       '16': 0
       '56': 3
+      '73': 1.5
