@@ -1,18 +1,14 @@
 package net.betterverse.oregenchange;
 
-import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class OreGenChange extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
     private static String PREFIX;
-    private static boolean DEBUG_ENABLED = false;
     private static OreGenChange instance;
-    private Config config;
-    public HashMap<World, HashMap<String, Double>> worlds = new HashMap<World, HashMap<String, Double>>();
+    private static Config config;
 
     public void onDisable() {
     }
@@ -22,6 +18,7 @@ public class OreGenChange extends JavaPlugin {
         instance = this;
         config = new Config(this);
         getServer().getPluginManager().registerEvents(new ChunkListener(this), this);
+        debug("Debug is enabled!");
     }
 
     public static OreGenChange getInstance() {
@@ -29,7 +26,7 @@ public class OreGenChange extends JavaPlugin {
     }
 
     public Config getCustomConfig() {
-        return this.config;
+        return config;
     }
 
     public static void info(String msg) {
@@ -37,7 +34,9 @@ public class OreGenChange extends JavaPlugin {
     }
 
     public static void debug(String msg) {
-        if(DEBUG_ENABLED) info(msg);
+        if(instance.getConfig().getBoolean("worlds.debug", false)) {
+            info(msg);
+        }
     }
 
     public static void warning(String msg) {

@@ -9,10 +9,12 @@ import java.util.Map;
 
 public class Config {
     private Map<String, Map<Material, Double>> worlds = new HashMap<String, Map<Material, Double>> ();
-    private Material defaultMaterial;
+    private Material defaultMaterial = Material.STONE;
+    private boolean debug = false;
     public enum ReplaceableMaterials {
-        STONE(1), GRASS(2), DIRT(3), COBBLESTONE(4), SAND(12), GRAVEL(13), GOLD_ORE(14), IRON_ORE(15), COAL_ORE(16),
-        LAPIS_ORE(21), SANDSTONE(24), DIAMOND_ORE(56), SOIL(60), REDSTONE_ORE(73);
+        AIR(0), STONE(1), GRASS(2), DIRT(3), COBBLESTONE(4), SAND(12), GRAVEL(13), GOLD_ORE(14), IRON_ORE(15),
+        COAL_ORE(16), LAPIS_ORE(21), SANDSTONE(24), DIAMOND_ORE(56), SOIL(60), REDSTONE_ORE(73),
+        GLOWING_REDSTONE_ORE(74);
 
         private int id;
         ReplaceableMaterials (int id) {
@@ -26,7 +28,8 @@ public class Config {
 
     public Config(OreGenChange instance) {
         if (instance.getConfig().contains("worlds")) {
-            this.defaultMaterial = Material.getMaterial(instance.getConfig().getInt("worlds.default"));
+            this.defaultMaterial = Material.getMaterial(instance.getConfig().getInt("worlds.default", 1));
+            this.debug = instance.getConfig().getBoolean("worlds.debug", false);
             Map<String, Object> nodeMap = instance.getConfig().getConfigurationSection("worlds").getValues(false);
             for (String world : nodeMap.keySet()) {
                 OreGenChange.debug("Found node " + world + "...");
@@ -49,10 +52,7 @@ public class Config {
                 }
             }
         }
-
-        //A little outputting
         printMap(this.worlds);
-
         instance.saveConfig();
     }
 
@@ -69,6 +69,10 @@ public class Config {
     
     public Material getDefaultMaterial() {
         return this.defaultMaterial;
+    }
+
+    public boolean isDebug() {
+        return this.debug;
     }
 
     public boolean isReplaceableMaterial(Material material) {
